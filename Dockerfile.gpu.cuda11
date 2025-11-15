@@ -1,21 +1,45 @@
 FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
+# Install Python 3.10, pip, and system dependencies
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip git ffmpeg libsm6 libxext6 \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y \
+       python3.10 \
+       python3.10-dev \
+       python3.10-distutils \
+       python3-pip \
+       git \
+       curl \
+       ffmpeg \
+       libsm6 \
+       libxext6 \
+       build-essential \
+       cmake \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/NekoSuneAI/rvc-tts-webui /app
+# Make python3 point to python3.10
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip
+
+# Clone the RVC-TTS WebUI
+RUN if [ -d /app ]; then rm -rf /app; fi && \
+    git clone https://github.com/NekoSuneAI/rvc-tts-webui /app
 WORKDIR /app
 
-RUN pip3 install --upgrade pip
+# Download Hubert & RMVPE models
+RUN curl -L -o hubert_base.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt && \
+    curl -L -o rmvpe.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt
 
-# Install PyTorch for CUDA 11
-RUN pip3 install --no-cache-dir \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu118
+# Install PyTorch with CUDA 11.8
+RUN python3 -m pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-RUN pip3 install --no-cache-dir fairseq
-RUN pip3 install --no-cache-dir transformers accelerate
+# Install Python requirements
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
+# Expose WebUI HTTP port
 EXPOSE 7860
+
 CMD ["python3", "app.py", "--port", "7860", "--share", "False"]
