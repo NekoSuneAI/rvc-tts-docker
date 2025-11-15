@@ -21,9 +21,14 @@ WORKDIR /app
 RUN curl -L -o /app/hubert_base.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt && \
     curl -L -o /app/rmvpe.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt
 
+# Upgrade pip first
+RUN python3 -m pip install --upgrade pip
+
 # Install PyTorch CPU
 RUN pip install --no-cache-dir torch torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cpu
+
+RUN pip install --no-cache-dir websockets>=11.0
 
 # Install Python requirements
 RUN pip install --no-cache-dir -r requirements.txt
