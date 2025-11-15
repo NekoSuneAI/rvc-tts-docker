@@ -5,6 +5,8 @@ RUN apt-get update && apt-get install -y \
     git ffmpeg libsm6 libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
+
+
 # Clone your RVC-TTS WebUI
 RUN git clone https://github.com/NekoSuneAI/rvc-tts-webui /app
 WORKDIR /app
@@ -15,7 +17,7 @@ RUN pip install --no-cache-dir \
     --index-url https://download.pytorch.org/whl/cpu
 
 # Install fairseq (CPU wheel, no CUDA build)
-RUN pip install --no-cache-dir fairseq
+RUN pip install --no-cache-dir fairseq2
 
 # Optional: transformers + accelerate for CPU-only pipelines
 RUN pip install --no-cache-dir transformers accelerate
