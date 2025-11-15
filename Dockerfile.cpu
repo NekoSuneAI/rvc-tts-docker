@@ -2,23 +2,23 @@ FROM python:3.10-slim
 
 # Install system deps
 RUN apt-get update && apt-get install -y \
-    git ffmpeg libsm6 libxext6 \
+    git ffmpeg curl libsm6 libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone your RVC-TTS WebUI
 RUN git clone https://github.com/NekoSuneAI/rvc-tts-webui /app
 WORKDIR /app
 
-curl -L -O https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt
-curl -L -O https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt
+# Download Hubert & RMVPE models
+RUN curl -L -o /app/hubert_base.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt && \
+    curl -L -o /app/rmvpe.pt https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt
 
-# Install PyTorch CPU version
-RUN pip install --no-cache-dir \
-    torch torchvision torchaudio \
+# Install PyTorch CPU
+RUN pip install --no-cache-dir torch torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cpu
 
-# Optional: transformers + accelerate for CPU-only pipelines
-RUN pip install -r requirements.txt
+# Install Python requirements
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose WebUI HTTP port
 EXPOSE 7860
