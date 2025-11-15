@@ -23,7 +23,13 @@ RUN pip install --no-cache-dir fairseq2
 RUN pip install --no-cache-dir \
     edge-tts \
     transformers \
-    accelerate
+    accelerate \
+    gradio \
+    faiss_cpu \
+    librosa \
+    praat-parselmouth \
+    pyworld \
+    torchcrepe
 
 # Expose WebUI HTTP port
 EXPOSE 7860
