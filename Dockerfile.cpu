@@ -20,7 +20,10 @@ RUN pip install --no-cache-dir \
 RUN pip install --no-cache-dir fairseq2
 
 # Optional: transformers + accelerate for CPU-only pipelines
-RUN pip install --no-cache-dir transformers accelerate
+RUN pip install --no-cache-dir \
+    edge-tts \
+    transformers \
+    accelerate
 
 # Expose WebUI HTTP port
 EXPOSE 7860
